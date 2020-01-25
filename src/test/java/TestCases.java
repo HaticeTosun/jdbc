@@ -2,6 +2,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
 import java.sql.*;
 
 public class TestCases {
@@ -22,15 +23,29 @@ public class TestCases {
     public void disconnect() throws SQLException {
         connection.close();
     }
+
     @Test
     public void  test() throws SQLException {
-        ResultSet rs= statement.executeQuery("SELECT first_name, last_name, email FROM students;");
+        ResultSet rs= statement.executeQuery("SELECT first_name, gender, fee FROM students limit 10;");
         while (rs.next()){
             String name =rs.getString(1);
-            String lastName =rs.getString(2);
-            String email =rs.getString(3);
-            System.out.println(name + " " + lastName + " " + email);
+            String gender =rs.getString(2);
+            String fee =rs.getString(3);
+            System.out.println(name + " " + gender + " " + fee);
         }
 
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE students SET fee = (fee * ?) WHERE gender = ?;");
+        preparedStatement.setDouble( 1, 1.15);
+        preparedStatement.setString(2, "Male");
+        preparedStatement.executeUpdate();
+
+        System.out.println("-------------------------------------------------------");
+        rs= statement.executeQuery("SELECT first_name, gender, fee FROM students  limit 10;");
+        while (rs.next()){
+            String name =rs.getString(1);
+            String gender =rs.getString(2);
+            String fee =rs.getString(3);
+            System.out.println(name + " " + gender + " " + fee);
+        }
     }
 }
