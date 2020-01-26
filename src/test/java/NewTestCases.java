@@ -101,12 +101,45 @@ public class NewTestCases {
             System.out.println("Fee: " + fee);
         }
 
-        statement.executeUpdate( "update students set fee = fee + 10 where gender = 'male' and country = 'United States'" );
+        statement.execute( "update students set fee = fee + 10 where gender = 'male' and country = 'United States'" );
         System.out.println("--------------------------------------------");
 
         rs = statement.executeQuery( "select fee from students " +
                 "where gender = 'male' and country = 'United States' " +
                 "limit 5" );
+        while(rs.next()) {
+            Double fee = rs.getDouble( 1 );
+            System.out.println("Fee: " + fee);
+        }
+    }
+
+    @Test
+    public void testTask7() throws SQLException {
+        String gender = "male";
+        String country = "United States";
+        int toAdd = 10;
+
+        PreparedStatement preparedStatement = connection.prepareStatement( "select fee from students " +
+                "where gender = ? and country = ? " +
+                "limit 5" );
+        preparedStatement.setString( 1, gender );
+        preparedStatement.setString( 2, country );
+        ResultSet rs = preparedStatement.executeQuery();
+        while(rs.next()) {
+            Double fee = rs.getDouble( 1 );
+            System.out.println("Fee: " + fee);
+        }
+
+        PreparedStatement updateStatement = connection.prepareStatement(
+                "update students set fee = fee + ? where gender = ? and country = ?" );
+
+        updateStatement.setInt( 1, toAdd );
+        updateStatement.setString( 2, gender );
+        updateStatement.setString( 3, country );
+        updateStatement.executeUpdate();
+        System.out.println("--------------------------------------------");
+
+        rs = preparedStatement.executeQuery();
         while(rs.next()) {
             Double fee = rs.getDouble( 1 );
             System.out.println("Fee: " + fee);
